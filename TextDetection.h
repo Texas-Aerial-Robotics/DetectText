@@ -57,33 +57,33 @@ struct Chain {
 bool Point2dSort (Point2d const & lhs,
                   Point2d const & rhs);
 
-IplImage * textDetection (IplImage *    float_input,
+cv::Mat textDetection (cv::Mat    float_input,
                           bool dark_on_light);
 
-void strokeWidthTransform (IplImage * edgeImage,
-                           IplImage * gradientX,
-                           IplImage * gradientY,
+void strokeWidthTransform (cv::Mat edgeImage,
+                           cv::Mat gradientX,
+                           cv::Mat gradientY,
                            bool dark_on_light,
-                           IplImage * SWTImage,
+                           cv::Mat SWTImage,
                            std::vector<Ray> & rays);
 
-void SWTMedianFilter (IplImage * SWTImage,
+void SWTMedianFilter (cv::Mat SWTImage,
                      std::vector<Ray> & rays);
 
 std::vector< std::vector<Point2d> >
-findLegallyConnectedComponents (IplImage * SWTImage,
+findLegallyConnectedComponents (cv::Mat SWTImage,
                                 std::vector<Ray> & rays);
 
 std::vector< std::vector<Point2d> >
-findLegallyConnectedComponentsRAY (IplImage * SWTImage,
+findLegallyConnectedComponentsRAY (cv::Mat SWTImage,
                                 std::vector<Ray> & rays);
 
-void componentStats(IplImage * SWTImage,
+void componentStats(cv::Mat SWTImage,
                                         const std::vector<Point2d> & component,
                                         float & mean, float & variance, float & median,
                                         int & minx, int & miny, int & maxx, int & maxy);
 
-void filterComponents(IplImage * SWTImage,
+void filterComponents(cv::Mat SWTImage,
                       std::vector<std::vector<Point2d> > & components,
                       std::vector<std::vector<Point2d> > & validComponents,
                       std::vector<Point2dFloat> & compCenters,
@@ -91,7 +91,7 @@ void filterComponents(IplImage * SWTImage,
                       std::vector<Point2d> & compDimensions,
                       std::vector<std::pair<Point2d,Point2d> > & compBB );
 
-std::vector<Chain> makeChains( IplImage * colorImage,
+std::vector<Chain> makeChains( cv::Mat colorImage,
                  std::vector<std::vector<Point2d> > & components,
                  std::vector<Point2dFloat> & compCenters,
                  std::vector<float> & compMedians,

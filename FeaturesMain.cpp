@@ -20,12 +20,12 @@
 #include <cassert>
 #include <fstream>
 #include "TextDetection.h"
-#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/opencv.hpp>
 #include <exception>
 
-void convertToFloatImage ( IplImage * byteImage, IplImage * floatImage )
+void convertToFloatImage ( cv::Mat byteImage, cv::Mat floatImage )
 {
-  cvConvertScale ( byteImage, floatImage, 1 / 255., 0 );
+  byteImage.convertTo(floatImage, CV_32F);
 }
 
 class FeatureError : public std::exception
@@ -44,48 +44,36 @@ FeatureError ( const std::string & msg, const std::string & file )
 }
 };
 
-IplImage * loadByteImage ( const char * name )
+cv::Mat loadByteImage ( const char * name )
 {
-  IplImage * image = cvLoadImage ( name );
-
-  if ( !image )
-  {
-    return 0;
-  }
-  cvCvtColor ( image, image, CV_BGR2RGB );
+  cv::Mat image = cv::imread( name );
+  
+  cv::cvtColor( image, image, cv::COLOR_BGR2RGB );
   return image;
 }
 
-IplImage * loadFloatImage ( const char * name )
+cv::Mat loadFloatImage ( const char * name )
 {
-  IplImage * image = cvLoadImage ( name );
+  cv::Mat image = cv::imread ( name );
 
-  if ( !image )
-  {
-    return 0;
-  }
-  cvCvtColor ( image, image, CV_BGR2RGB );
-  IplImage * floatingImage = cvCreateImage ( cvGetSize ( image ),
-                                             IPL_DEPTH_32F, 3 );
-  cvConvertScale ( image, floatingImage, 1 / 255., 0 );
-  cvReleaseImage ( &image );
+  cv::cvtColor ( image, image, cv::COLOR_BGR2RGB );
+  cv::Mat floatingImage;
+  
+  convertToFloatImage(image, floatingImage);
+  
   return floatingImage;
 }
 
 int mainTextDetection ( int argc, char * * argv )
 {
-  IplImage * byteQueryImage = loadByteImage ( argv[1] );
-  if ( !byteQueryImage )
-  {
-    printf ( "couldn't load query image\n" );
-    return -1;
-  }
+  cv::Mat byteQueryImage = loadByteImage ( argv[1] );
+  
+  std::cout << byteQueryImage.size << std::endl;
 
   // Detect text in the image
-  IplImage * output = textDetection ( byteQueryImage, atoi(argv[3]) );
-  cvReleaseImage ( &byteQueryImage );
-  cvSaveImage ( argv[2], output );
-  cvReleaseImage ( &output );
+  int x = atoi(argv[3]);
+  cv::Mat output = textDetection ( byteQueryImage,  x);
+  cv::imwrite(argv[2], output);
   return 0;
 }
 
